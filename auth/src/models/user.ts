@@ -1,4 +1,5 @@
 import mongoose from "mongoose";  // Importing mongoose to interact with MongoDB.
+import { Password } from '../services/password'; // Import the Password class for hashing / comparing passwords
 
 // UserAttrs interface: This defines the properties required to create a new User.
 interface UserAttrs {
@@ -27,6 +28,24 @@ const userSchema = new mongoose.Schema({
         type: String,  // The password field should be a string.
         required: true  // The password field is required.
     }
+});
+
+// This is a Mongoose middleware function that gets executed before a document is saved to the database.
+userSchema.pre('save', async function(done) {
+    // 'this' refers to the document that is about to be saved.
+    // 'isModified' is a Mongoose method that checks if a certain field has been modified.
+    // In this case, it checks if the 'password' field has been modified.
+    if (this.isModified('password')) {
+        // If the password has been modified, it needs to be hashed before saving.
+        // 'Password.toHash' is a static method defined in the Password class that hashes a password.
+        const hashed = await Password.toHash(this.get('password'));
+        // 'this.set' is a Mongoose method that sets the value of a field in the document.
+        // Here, it sets the 'password' field to the hashed password.
+        this.set('password', hashed);
+    }
+    // 'done' is a callback function that needs to be called when the middleware function is done.
+    // It signals to Mongoose that it can proceed with the save operation.
+    done();
 });
 
 // Adding a static method to the user schema to build new User documents.
