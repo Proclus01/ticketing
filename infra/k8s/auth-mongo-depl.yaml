@@ -1,0 +1,48 @@
+# This YAML file creates a Deployment and a Service for a MongoDB instance
+
+# Start of the Deployment definition
+apiVersion: apps/v1 # The version of Kubernetes API to use for creating this Deployment
+kind: Deployment # Specifies that we are defining a Deployment object
+
+metadata: # The metadata for this Deployment
+  name: auth-mongo-depl # The name of the Deployment. This is how you'll refer to this Deployment in the future
+
+spec: # The specification of the Deployment
+  replicas: 1 # The number of Pods to deploy
+
+  # The selector is a way of letting the Deployment know which Pods it should manage
+  selector:
+    matchLabels:
+      app: auth-mongo # Pods with this label will be managed by this Deployment
+
+  # The template for the Pods this Deployment will manage
+  template:
+    metadata:
+      labels:
+        app: auth-mongo # This label will be applied to each Pod created by this Deployment
+    spec:
+      containers: # The specification for the container that will run in each Pod
+        - name: auth-mongo # The name of the container
+          image: mongo # The Docker image to use for this container
+
+# Separator between Kubernetes objects
+---
+
+# Start of the Service definition
+apiVersion: v1 # The version of Kubernetes API to use for creating this Service
+kind: Service # Specifies that we are defining a Service object
+
+metadata: # The metadata for this Service
+  name: auth-mongo-srv # The name of the Service. This is how you'll refer to this Service in the future
+
+spec: # The specification of the Service
+  # The selector is a way of letting the Service know which Pods it should manage
+  selector:
+    app: auth-mongo # Pods with this label will be managed by this Service
+
+  # The ports that this Service will forward
+  ports:
+    - name: db # A name for this port configuration
+      protocol: TCP # The protocol to use for this port
+      port: 27017 # The port number that will be exposed on the Service, 27017 is default MongoDB port
+      targetPort: 27017 # The port number on the Pods that the Service will forward requests to
