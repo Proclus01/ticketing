@@ -28,6 +28,20 @@ const userSchema = new mongoose.Schema({
         type: String,  // The password field should be a string.
         required: true  // The password field is required.
     }
+}, {
+    // The toJSON property is a special property in Mongoose schemas that allows you to customize how the results of a query are converted into JSON.
+    toJSON: {
+        // The transform function is a method that Mongoose calls when you convert a MongoDB document into a JSON representation.
+        // It gets passed the mongoose document and the plain JavaScript object that results from calling .toObject() on the mongoose document.
+        // The 'doc' parameter is the mongoose document being converted.
+        // The 'ret' (short for resultant object) parameter is the plain object representation which will be turned into JSON.
+        transform(doc, ret) {
+            ret.id = ret._id; // Set _id to become id and normalize the JSON
+            delete ret._id; // delete the old _id field so it is not returned
+            delete ret.password; // delete the password field so that is not returned
+            delete ret.__v; // delete the version field so that is not returned
+        }
+    }
 });
 
 // This is a Mongoose middleware function that gets executed before a document is saved to the database.
