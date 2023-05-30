@@ -4,37 +4,50 @@ import { User } from "../models/user";
 import { RequestValidationError } from "../errors/request-validation-error";
 import { BadRequestError } from "../errors/bad-request-error";
 
+// Create a new router object
 const router = express.Router();
 
+// Define a POST route for user signup
 router.post(
   "/api/users/signup",
   [
+    // Validate the email field
     body("email").isEmail().withMessage("Email must be valid"),
+    // Validate the password field
     body("password")
-      .trim()
-      .isLength({ min: 4, max: 20 })
-      .withMessage("Password must be between 4 and 20 cahracters"),
+      .trim() // Remove leading and trailing whitespace
+      .isLength({ min: 4, max: 20 }) // Check the length of the password
+      .withMessage("Password must be between 4 and 20 characters"),
   ],
   async (req: Request, res: Response) => {
+    // Check for validation errors
     const errors = validationResult(req);
 
+    // If there are validation errors, throw a RequestValidationError
     if (!errors.isEmpty()) {
       throw new RequestValidationError(errors.array());
     }
 
+    // Extract email and password from the request body
     const { email, password } = req.body;
 
+    // Check if a user with the provided email already exists
     const existingUser = await User.findOne({ email });
 
+    // If a user with the provided email already exists, throw a BadRequestError
     if (existingUser) {
       throw new BadRequestError("Email in use");
     }
 
+    // Create a new user
     const user = User.build({ email, password });
+    // Save the new user to the database
     await user.save();
 
+    // Send a 201 Created status code along with the new user
     res.status(201).send(user);
   }
 );
 
+// Export the router
 export { router as signupRouter };
