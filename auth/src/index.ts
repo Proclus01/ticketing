@@ -38,6 +38,10 @@ app.use(errorHandler);  // Attaching our custom error handler to the express app
 
 // The start function connects to MongoDB and starts the express application.
 const start = async () => {
+    if (!process.env.JWT_KEY) {
+        throw new Error('JWT_KEY must be defined');
+    }
+
     try {
         await mongoose.connect('mongodb://auth-mongo-srv:27017/auth');  // Connecting to MongoDB.
         console.log('Connected to MongoDB');

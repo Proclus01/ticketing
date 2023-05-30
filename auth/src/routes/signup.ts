@@ -48,9 +48,11 @@ router.post(
 
     // Generate a JWT
     const userJwt = jwt.sign({
-        id: user.id,
-        email: user.email
-    }, 'asdf');
+            id: user.id,
+            email: user.email
+        }, 
+        process.env.JWT_KEY! // exclamation tells TypeScript that we already know this env variable is defined
+    );
 
     // Store it on the session object
     req.session = {
