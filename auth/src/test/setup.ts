@@ -6,8 +6,11 @@ let mongo: any;
 
 // A hook function to run before all our tests are executed
 beforeAll(async () => {
-    mongo = new MongoMemoryServer();
-    const mongoUri = await mongo.getUri();
+    process.env.JWT_KEY = 'asdfasdf';
+
+    mongo = await MongoMemoryServer.create();
+
+    const mongoUri = mongo.getUri();
 
     await mongoose.connect(mongoUri);
 })
