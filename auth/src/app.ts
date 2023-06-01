@@ -18,7 +18,7 @@ app.use(json());  // Using body-parser middleware to parse JSON payloads.
 app.use(
     cookieSession({
         signed: false, // Disable cookie encryption
-        secure: true // Only allow cookie access via HTTPS requests
+        secure: process.env.NODE_ENV !== 'test' // Only allow cookie access via HTTPS requests
     })
 );
 
